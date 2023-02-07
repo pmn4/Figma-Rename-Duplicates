@@ -1,0 +1,20 @@
+{
+  "name": "rename-duplicates",
+  "version": "1.0.0",
+  "description": "Rename Duplicate Nodes",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "npm run build -- --watch"
+  },
+  "author": "@pnewell4",
+  "license": "MIT",
+  "devDependencies": {
+    "@figma/plugin-typings": "*",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.33.0",
+    "prettier": "^2.8.3",
+    "typescript": "*"
+  }
+}

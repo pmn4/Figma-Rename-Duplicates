@@ -1,0 +1,8 @@
+{
+  "name": "Rename Duplicates",
+  "id": "1204788726895065631",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "ui": "ui.html"
+}

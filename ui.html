@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rename Duplicates</title>
+
+    <style>
+      body {
+        background-color: var(--figma-color-bg);
+        color: var(--figma-color-text);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="template" style="display: none">
+      <div class="row">
+        <div class="col-md-12">
+          <input
+            class="input-field"
+            name="{{id}}"
+            type="text"
+            placeholder="{{name}}"
+            style="width: 100%; margin-top: 5px"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <h4 id="title"></h4>
+
+        <div id="container">initializing...</div>
+
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 10px;
+          "
+        >
+          <button id="skip-remaining">Skip remaining</button>
+          <button id="skip" style="margin-left: 5px">Skip</button>
+          <button id="save" style="margin-left: 5px">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var DEBUG = true;
+      function log() {
+        if (!DEBUG) return;
+
+        console.log(...arguments);
+      }
+
+      document
+        .getElementById("skip-remaining")
+        .addEventListener("click", function () {
+          parent.postMessage(
+            { pluginMessage: { action: "skip-remaining" } },
+            "*"
+          );
+        });
+      document.getElementById("skip").addEventListener("click", function () {
+        parent.postMessage({ pluginMessage: { action: "skip" } }, "*");
+      });
+      document.getElementById("save").addEventListener("click", function () {
+        const namesMap = [...$container.getElementsByTagName("input")].map(
+          (input) => ({
+            id: input.name,
+            name: input.value,
+          })
+        );
+
+        parent.postMessage(
+          { pluginMessage: { action: "save", namesMap } },
+          "*"
+        );
+      });
+
+      const $titleElement = document.getElementById("title");
+      const $template = document.getElementById("template");
+      const $container = document.getElementById("container");
+
+      window.onmessage = (e) => {
+        const { action, duplicateNodes, i, total } = e.data.pluginMessage;
+
+        $titleElement.innerText = `${duplicateNodes.length} Duplicates (${
+          total - i
+        } remaining)`;
+        const nodes = duplicateNodes.map((node) => {
+          const clone = $template.cloneNode(true);
+          const input = clone.querySelector("input");
+          input.name = node.id;
+          input.placeholder = node.id + ": " + node.name;
+          input.value = node.name;
+
+          input.addEventListener("focus", function () {
+            parent.postMessage(
+              { pluginMessage: { action: "input-focus", id: node.id } },
+              "*"
+            );
+          });
+
+          input.addEventListener("blur", function () {
+            // do any other inputs have focus?
+            if (document.activeElement.tagName === "INPUT") return;
+
+            parent.postMessage(
+              { pluginMessage: { action: "input-blur", id: node.id } },
+              "*"
+            );
+          });
+
+          delete clone.id;
+          clone.style.display = "block";
+
+          return clone;
+        });
+
+        $container.replaceChildren(...nodes);
+
+        log("UI LOG", e.data.pluginMessage);
+      };
+    </script>
+  </body>
+</html>
