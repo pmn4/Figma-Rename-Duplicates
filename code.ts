@@ -1,4 +1,4 @@
-const DEBUG = true;
+const DEBUG = false;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function log(...args: any[]) {
